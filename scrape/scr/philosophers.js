@@ -1,11 +1,13 @@
-const express = require('express');
 const fs = require('fs');
 const request = require('request');
 const cheerio = require('cheerio');
+const router = require('express').Router();
+const db = require('../../db/index');
+const Url = db.model('url');
 
-const app = express();
+router.get('/:span', (req, res, next) => { 
+	const span = req.params.span;
 
-app.get('/scrape', (req, res, next) => { 
 	const links = {
 		'a-c': 'https://en.wikipedia.org/wiki/List_of_philosophers_(A%E2%80%93C)',
 		'd-h': 'https://en.wikipedia.org/wiki/List_of_philosophers_(D%E2%80%93H)',
@@ -19,8 +21,8 @@ app.get('/scrape', (req, res, next) => {
 		'r-z': ['R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 	};
 
-	const url = links['r-z'];
-	const letters = chars['r-z'];
+	const url = links[span];
+	const letters = chars[span];
 
 	letters.forEach(letter => {
 		request(url, (err, res, html) => {
@@ -28,7 +30,7 @@ app.get('/scrape', (req, res, next) => {
 			else {
 
 				let $ = cheerio.load(html);
-				let philosophers = {};
+				let philosophers = [];
 				let loc = 'h2';
 
 				$(loc)
@@ -38,22 +40,26 @@ app.get('/scrape', (req, res, next) => {
 					.next()
 					.find('li')
 					.each(function(i, el) {
-						let name = $(this).children().first().text();
+						let philosopher = {
+							name: '',
+							url: ''
+						};
+						let currName = $(this).children().first().text();
 						let currUrl = $(this).children().first().attr('href');
-						philosophers[name] = currUrl;
+
+						if (currUrl[2] === 'i') {
+							philosopher.name = currName;
+							philosopher.url = currUrl;
+
+							Url.create(philosopher);
+						}
 					});
 
-				console.log(JSON.stringify(philosophers, null, 4));
-
-				fs.writeFile(`philosophers_${letter}.json`, JSON.stringify(philosophers, null, 4), (err) => {
-					if (err) console.log(err);
-					else console.log('File successfully written!');
-				});
+				console.log(philosophers);
 			}
 		});
+
 	});
 });
 
-app.listen(3000, () => { console.log('listening on port 3000')});
-
-module.exports = { app }
+module.exports = router;

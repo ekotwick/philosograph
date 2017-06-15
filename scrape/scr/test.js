@@ -277,3 +277,9 @@ app.get('/scrape', (req, res, next) => {
 app.listen(3000, () => { console.log('listening on port 3000')});
 
 module.exports = { app }
+
+
+				// fs.writeFile(`phil_${letter}.json`, JSON.stringify(philosophers, null, 4), (err) => {
+				// 	if (err) console.log(err);
+				// 	else console.log('File successfully written!');
+				// });

@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon scrape/server.js",
-    "influence": "node scrape/influence.js",
-    "philosophers": "node scrape/philosophers.js"
+    "startscr": "nodemon scrape/index.js",
+    "testscr": "nodemon scrape/routes/test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "cheerio": "^1.0.0-rc.1",
     "express": "^4.15.3",
     "pg": "^6.2.4",

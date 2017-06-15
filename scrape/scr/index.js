@@ -3,6 +3,7 @@
 const router = require('express').Router();
 
 router.use('/phil', require('./philosophers'));
+router.use('/firstUrl', require('./sortPhilosophers'));
 
 router.get('/', (req, res, next) => {
 	res.sendStatus(200);

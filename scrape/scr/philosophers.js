@@ -1,4 +1,5 @@
-const fs = require('fs');
+'use strict';
+
 const request = require('request');
 const cheerio = require('cheerio');
 const router = require('express').Router();
@@ -30,7 +31,6 @@ router.get('/:span', (req, res, next) => {
 			else {
 
 				let $ = cheerio.load(html);
-				let philosophers = [];
 				let loc = 'h2';
 
 				$(loc)
@@ -47,6 +47,8 @@ router.get('/:span', (req, res, next) => {
 						let currName = $(this).children().first().text();
 						let currUrl = $(this).children().first().attr('href');
 
+						// listed philosophers without a page of their own have hrefs like "/w/index.php?..."
+						// this `if` filters those out
 						if (currUrl[2] === 'i') {
 							philosopher.name = currName;
 							philosopher.url = currUrl;
@@ -54,11 +56,8 @@ router.get('/:span', (req, res, next) => {
 							Url.create(philosopher);
 						}
 					});
-
-				console.log(philosophers);
 			}
 		});
-
 	});
 });
 

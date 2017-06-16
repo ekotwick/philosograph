@@ -21,7 +21,7 @@ app.listen(port, function () {
 app.use('/scr', require('./scr/index.js'));
 
 app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, '..', 'public'));
+  res.sendFile(path.join(__dirname, '..', 'private'));
 });
 
 app.use(function (err, req, res, next) {

@@ -39,6 +39,7 @@ app.get('/', (req, res, next) => {
         ////
 
         let nodeSchool = findTwoDeep($, nodeBio, 'School');
+        // if (notableIdeas.children().length) {
         if (nodeSchool) {
           let schools = [];
           let children = nodeSchool.find('td').children();
@@ -74,6 +75,7 @@ app.get('/', (req, res, next) => {
         ////
 
         let nodeInterests = findTwoDeep($, nodeBio, 'Main interests');
+        // if (notableIdeas.children().length) {
         if (nodeInterests) {
           let interests = [];
           let children = nodeInterests.find('td').children();
@@ -117,6 +119,54 @@ app.get('/', (req, res, next) => {
           json.mainInterests = interests;
         }
 
+        ////////////////
+        ////
+        ////  get notable ideas
+        ////
+
+        let notableIdeas = findByFilterSchool($, nodeBio, 'Notable ideas');
+        if (notableIdeas.children().length) {
+          let ideas = [];
+          let children = notableIdeas.find('td').children();
+          if (!children.length) {
+            console.log('\n\nhere\n\n')
+            let idea = { name: '', href: '' };
+            idea.name = notableIdeas.find('td').text();
+            idea.href = notableIdeas.find('td').attr('href');
+            ideas.push(idea);
+          if (children.children().first().is('ul')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let idea = { name: '', href: '' };
+                idea.name = $(this).text();
+                idea.href = $(this).attr('href');
+                ideas.push(idea);
+              });
+          } else if (children.children().first().is('div')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let idea = { name: '', href: '' };
+                idea.name = $(this).text();
+                idea.href = $(this).attr('href');
+                ideas.push(idea);
+              });
+          } else {
+            children
+              .each(function(i, el){
+                if ($(this).is('a')) {
+                  let idea = { name: '', href: '' };
+                  idea.name = $(this).text();
+                  idea.href = $(this).attr('href');
+                  ideas.push(idea);
+                }
+              });
+          }
+          json.notableIdeas = ideas;
+        }
 
       }
     });

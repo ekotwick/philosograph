@@ -106,6 +106,7 @@ app.get('/', (req, res, next) => {
           // console.log(nodeInterests)
           let interests = [];
           let children = nodeInterests.find('td').children();
+          // this checks for the case where the information is stated directly within <td> tags
           if (!children.length) {
             console.log('\n\nhere\n\n')
             let interest = { name: '', href: '' };
@@ -148,15 +149,69 @@ app.get('/', (req, res, next) => {
         }
 
         // get notable ideas
-        let notableIdeas = findByFilter($, nodeBio, 'Notable ideas');
-        if (notableIdeas) {
-          // console.log('\n IDEAS \n')
-          let ideas = getItems($, notableIdeas);
+        let notableIdeas = findByFilterSchool($, nodeBio, 'Notable ideas');
+        // this checks whether there exists such a node;
+        if (notableIdeas.children().length) {
+          // console.log(nodeInterests)
+          let ideas = [];
+          let children = notableIdeas.find('td').children();
+          if (!children.length) {
+            console.log('\n\nhere\n\n')
+            let idea = { name: '', href: '' };
+            idea.name = notableIdeas.find('td').text();
+            idea.href = notableIdeas.find('td').attr('href');
+            ideas.push(idea);
+          }
+          // this is to check the cases where the information is placed directly in the <tr> tag, but there are stupid as children in there as well, but which don't carry any information
+          // if (children.find('div').length === 0 && children.find('ul').length ===0) {
+          // console.log('<———————————————', url, '———————————————>')
+          //   let idea = { name: '', href: '' };
+          //   idea.name = notableIdeas.find('td').text();
+          //   idea.href = notableIdeas.find('td').attr('href');
+          //   ideas.push(idea);
+          // }
+          if (children.children().first().is('ul')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let idea = { name: '', href: '' };
+                idea.name = $(this).text();
+                idea.href = $(this).attr('href');
+                ideas.push(idea);
+              });
+          } else if (children.children().first().is('div')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let idea = { name: '', href: '' };
+                idea.name = $(this).text();
+                idea.href = $(this).attr('href');
+                ideas.push(idea);
+              });
+          } else {
+            children
+              .each(function(i, el){
+                if ($(this).is('a')) {
+                  let idea = { name: '', href: '' };
+                  idea.name = $(this).text();
+                  idea.href = $(this).attr('href');
+                  ideas.push(idea);
+                }
+                // if (!$(this).is('br') && !$(this).is('sup')) {
+                  // let idea = { name: '', href: '' };
+                  // idea.name = $(this).text();
+                  // idea.href = $(this).attr('href');
+                  // ideas.push(idea);
+                // }
+              });
+          }
           json.notableIdeas = ideas;
         }
 
         // get notable works
-        let notableWorks = findByFilter($, nodeBio, 'Notable works');
+        let notableWorks = findByFilterSchool($, nodeBio, 'Notable work');
         if (notableWorks) {
           // console.log('\n WORKS \n')
           let works = getItems($, notableWorks);

@@ -71,6 +71,16 @@ app.get('/', (req, res, next) => {
                 school.href = $(this).attr('href');
                 schools.push(school);
               });
+          } else if (children.children().first().is('div')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let school = { name: '', href: '' };
+                school.name = $(this).text();
+                school.href = $(this).attr('href');
+                schools.push(school);
+              });
           } else {
             children
               .each(function(i, el){
@@ -91,15 +101,54 @@ app.get('/', (req, res, next) => {
         // }
 
         // get interestes
-        let nodeInterests = findByFilter($, nodeBio, 'Main Interests');
+        let nodeInterests = findByFilterSchool($, nodeBio, 'Main interests');
         if (nodeInterests) {
-          // console.log('\n INTERESTS \n')
-          let interests = getItems($, nodeInterests);
+          // console.log(nodeInterests)
+          let interests = [];
+          let children = nodeInterests.find('td').children();
+          if (!children.length) {
+            console.log('\n\nhere\n\n')
+            let interest = { name: '', href: '' };
+            interest.name = nodeInterests.find('td').text();
+            interest.href = nodeInterests.find('td').attr('href');
+            interests.push(interest);
+          }
+          if (children.children().first().is('ul')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let interest = { name: '', href: '' };
+                interest.name = $(this).text();
+                interest.href = $(this).attr('href');
+                interests.push(interest);
+              });
+          } else if (children.children().first().is('div')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let interest = { name: '', href: '' };
+                interest.name = $(this).text();
+                interest.href = $(this).attr('href');
+                interests.push(interest);
+              });
+          } else {
+            children
+              .each(function(i, el){
+                if (!$(this).is('br')) {
+                  let interest = { name: '', href: '' };
+                  interest.name = $(this).text();
+                  interest.href = $(this).attr('href');
+                  interests.push(interest);
+                }
+              });
+          }
           json.mainInterests = interests;
         }
 
         // get notable ideas
-        let notableIdeas = findByFilter($, nodeBio, 'Notable Ideas');
+        let notableIdeas = findByFilter($, nodeBio, 'Notable ideas');
         if (notableIdeas) {
           // console.log('\n IDEAS \n')
           let ideas = getItems($, notableIdeas);
@@ -107,7 +156,7 @@ app.get('/', (req, res, next) => {
         }
 
         // get notable works
-        let notableWorks = findByFilter($, nodeBio, 'Notable Works');
+        let notableWorks = findByFilter($, nodeBio, 'Notable works');
         if (notableWorks) {
           // console.log('\n WORKS \n')
           let works = getItems($, notableWorks);
@@ -130,7 +179,7 @@ app.get('/', (req, res, next) => {
           json.influenced = followers;
         }
 
-        console.log(JSON.stringify(json, null, 2));
+        console.log(JSON.stringify(json, null, 5));
 
       }
     });
@@ -141,12 +190,29 @@ app.listen(3000, () => { console.log('listening on port 3000')});
 
 module.exports = { app }
 
+// const findByFilter = ($, node, criterion) => {
+//   let returnNode = 
+//     node
+//       .children()
+//       .filter(function(i, el) {
+//         $(this)
+//       })
+// }
+
 const findByFilter = ($, node, criterion) => {
   let returnNode = 
+    // let th = node.find('tr').children().first();
+    // if (th.children().first().is('div')) return th.children().first().text();
+    // else return 
+      // .find('th')
+      // .filter(function(i, el) {
+      //   return $(this).text() === criterion;
+      // })
     node
       .children()
       .filter(function(i, el) {
-        return $(this).children().first().text() === criterion;
+        let titleNode = $(this).children().first();
+        return titleNode.text() === criterion;
       });
   return returnNode;
 }

@@ -38,10 +38,11 @@ app.get('/', (req, res, next) => {
         ////  get schools
         ////
 
-        let nodeSchool = findByFilterSchool($, nodeBio, 'School');
+        let nodeSchool = findTwoDeep($, nodeBio, 'School');
         if (nodeSchool) {
           let schools = [];
           let children = nodeSchool.find('td').children();
+          // case one: school infromation is displayed with <a> tags in <l1> tags
           if (children.children().first().is('ul')) {
             children
               .find('li')
@@ -52,6 +53,7 @@ app.get('/', (req, res, next) => {
                 school.href = $(this).attr('href');
                 schools.push(school);
               });
+          // case two: school information is displayed simply with <a> tags
           } else {
             children
               .each(function(i, el){
@@ -66,7 +68,67 @@ app.get('/', (req, res, next) => {
           json.schools = schools;
         }
 
+        ////////////////
+        ////
+        ////  get main interests
+        ////
+
+        let nodeInterests = findTwoDeep($, nodeBio, 'Main interests');
+        if (nodeInterests) {
+          let interests = [];
+          let children = nodeInterests.find('td').children();
+          if (!children.length) {
+            let interest = { name: '', href: '' };
+            interest.name = nodeInterests.find('td').text();
+            interest.href = nodeInterests.find('td').attr('href');
+            interests.push(interest);
+          }
+          if (children.children().first().is('ul')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let interest = { name: '', href: '' };
+                interest.name = $(this).text();
+                interest.href = $(this).attr('href');
+                interests.push(interest);
+              });
+          } else if (children.children().first().is('div')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let interest = { name: '', href: '' };
+                interest.name = $(this).text();
+                interest.href = $(this).attr('href');
+                interests.push(interest);
+              });
+          } else {
+            children
+              .each(function(i, el){
+                if (!$(this).is('br')) {
+                  let interest = { name: '', href: '' };
+                  interest.name = $(this).text();
+                  interest.href = $(this).attr('href');
+                  interests.push(interest);
+                }
+              });
+          }
+          json.mainInterests = interests;
+        }
+
+
       }
     });
   });
 });
+
+const findTwoDeep = ($, node, criterion) => {
+  let returnNode = 
+    node
+      .children()
+      .filter(function(i, el) {
+        return $(this).children().first().children().first().text() === criterion;
+      });
+  return returnNode;
+}

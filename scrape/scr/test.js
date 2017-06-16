@@ -5,281 +5,196 @@ const cheerio = require('cheerio');
 
 const app = express();
 
-// app.get('/scrape', (req, res, next) => {
+app.get('/', (req, res, next) => {
 
-//  // url to be scrapped
-//  // let url = `https://en.wikipedia.org/wiki/Aristotle`;
-//  // let url = `https://en.wikipedia.org/wiki/Ludwig_Wittgenstein`;
-//  let url = `https://en.wikipedia.org/wiki/Parmenides`;
-
-
-//  // structure of request call: 
-//  // first arg: url 
-//  // second arg: callback -> first arg: error, second: res, third: html
-//  request(url, (err, res, html) => {
-//    if (err) console.log(err);
-//    else {
-//      const $ = cheerio.load(html);
-//      const json = {
-//        influences: ''
-//      };
-
-//      const NavContent = '.NavContent';
-//      const NavHead = '.NavHead';
-
-//      // // let data = $(NavContent).map(elem => {
-//      // //   return elem.children();
-//      // // });
-//      // // res.send(data);
-//      // let data = $(NavContent)['0'].children;
-//      // console.log(data);
-
-//      // let influences = $(NavContent).find('a').map((i, el) => $(this).attr('href'));
-
-//      //##### this gives me just one attribute, namely of the first item
-//      // influences = $(NavContent).find('a').attr('href');
-
-//      //##### this will give me a full list of all links to other pages
-//      // let data = [];
-//      // $(NavContent).find('a').each(function(i, elem) {
-//      //  data[i] = $(this).attr('href');
-//      // });
-
-
-//      // ####wikipedia is retarded, so this doesn't work exactly right: 
-//      //  [ '\n\n\n\nParmenides\nSocrates\nPlato\nHeraclitus\nDemocritus\n\n\n\n',
-//      // 'Parmenides',
-//      // 'Socrates',
-//      // 'Plato',
-//      // 'Heraclitus',
-//      // // 'Democritus',
-//      // let data = [];
-//      // $(NavContent).find('li').each(function(i, elem) {
-//      //  data[i] = $(this).text();
-//      // });
-//      // json.influences = data;
-
-//      // ### this gives me a list of influences
-//      // "{ influences: [ 'Parmenides', 'Socrates', 'Plato', 'Heraclitus', 'Democritus' ] }"
-//      // i get the influences only because of the uniqueness of Aristotle;
-//      // let data = [];
-//      // $(NavContent).find('.hlist').find('li').each(function(i, elem) {
-//      //  data[i] = $(this).text();
-//      // });
-
-//      // let data = [];
-//      // $(NavHead).filter(function(i, el) {
-//      //  return $(this).text() === 'Influences';
-//      // })
-//      //  .siblings()
-//      //  .find('li').each(function(i, el) {
-//      //    data[i] = $(this).text();
-//      //  })
-
-//      // #############################################################################
-
-//      let data = [];
-//      $(NavHead).filter(function(i, el) {
-//        return $(this).text() === 'Influenced';
-//      })
-//        .siblings()
-//        .find('li').each(function(i, el) {
-//          data[i] = $(this).text();
-//        });
-
-//      let 
-
-//      // $(NavHead).filter(function(i, el) {
-//      //  return $(this).text() === 'Influences';
-//      // })
-//      //  .siblings()
-//      //  .find('li').each(function(i, el) {
-//      //    data[i] = $(this).text();
-//      //  });
-
-//      // #############################################################################
-
-
-//      json.influences = data;
-
-//      // filter(() => {
-//      //  let data = $(this);
-//      //  let influences = data.find('ul').length;
-//      //  json.influences = influences;
-//      // });
-
-//      console.log(json);
-
-//    }
-//  })
-
-
-// });
-
-
-// #############################################################################
-// #############################################################################
-// #############################################################################
-// #############################################################################
-// ###############                                             #################
-// ###############            FOR GETTING DATA                 #################
-// ###############                                             #################
-// #############################################################################
-// #############################################################################
-// #############################################################################
-
-// app.get('/scrape', (req, res, next) => {
-
-//  // url to be scrapped
-//  // let url = `https://en.wikipedia.org/wiki/Aristotle`;
-//  // let url = `https://en.wikipedia.org/wiki/Ludwig_Wittgenstein`;
-//  let url = `https://en.wikipedia.org/wiki/Parmenides`;
-
-
-//  // structure of request call: 
-//  // first arg: url 
-//  // second arg: callback -> first arg: error, second: res, third: html
-//  request(url, (err, res, html) => {
-//    if (err) console.log(err);
-//    else {
-//      let $ = cheerio.load(html);
-//      let postPPL, postURL, getPPL, getURL;
-//      let json = {
-//        postPPL: [],
-//        postURL: [],
-//        getPPL: [],
-//        getURL: []
-//      };
-
-//      const NavHead = '.NavHead';
-
-//      postPPL = [];
-//      $(NavHead).filter(function(i, el) {
-//        return $(this).text() === 'Influenced';
-//      })
-//        .siblings()
-//        .find('li').each(function(i, el) {
-//          postPPL[i] = $(this).text();
-//        });
-
-//      postURL = [];
-//      $(NavHead).filter(function(i, el) {
-//        return $(this).text() === 'Influenced';
-//      })
-//        .siblings()
-//        .find('a').each(function(i, el) {
-//          postURL[i] = $(this).attr('href');
-//        });
-
-//      getPPL = [];
-//      $(NavHead).filter(function(i, el) {
-//        return $(this).text() === 'Influences';
-//      })
-//        .siblings()
-//        .find('li').each(function(i, el) {
-//          getPPL[i] = $(this).text();
-//        });
-
-//      getURL = [];
-//      $(NavHead).filter(function(i, el) {
-//        return $(this).text() === 'Influences';
-//      })
-//        .siblings()
-//        .find('a').each(function(i, el) {
-//          getURL[i] = $(this).attr('href');
-//        });
-
-//      json.postPPL = postPPL;
-//      json.postURL = postURL;
-//      json.getPPL = getPPL;
-//      json.getURL = getURL;
-
-//      console.log(json);
-
-//    }
-//  });
-
-
-// });
-
-app.get('/scrape', (req, res, next) => {
-
-  const urls = ['https://en.wikipedia.org/wiki/Aristotle', 'https://en.wikipedia.org/wiki/Ludwig_Wittgenstein', 'https://en.wikipedia.org/wiki/Parmenides'];
-
-  const group = [];
-  const NavHead = '.NavHead';
-
+  const urls = [
+  'https://en.wikipedia.org/wiki/Aristotle',
+  'https://en.wikipedia.org/wiki/Ludwig_Wittgenstein',
+  'https://en.wikipedia.org/wiki/Parmenides'
+  ];
 
   urls.forEach(url => {
     request(url, (err, res, html) => {
       if (err) console.log(err);
       else {
         let $ = cheerio.load(html);
-        let postPPL, postURL, getPPL, getURL;
-        let json = {
-          postPPL: [],
-          postURL: [],
-          getPPL: [],
-          getURL: []
-        };
+        let json = {}
 
-        postPPL = [];
-        $(NavHead).filter(function(i, el) {
-          return $(this).text() === 'Influenced';
-        })
-          .siblings()
-          .find('li').each(function(i, el) {
-            postPPL[i] = $(this).text();
-          });
+        let bio = {};
+        let nodeBio = $('.vcard').children().first();
+        // get name
+        let nodeName = 
+          nodeBio
+            .find($('.fn'));
+        let name = nodeName.text();
+        bio.name = name;
 
-        postURL = [];
-        $(NavHead).filter(function(i, el) {
-          return $(this).text() === 'Influenced';
-        })
-          .siblings()
-          .find('a').each(function(i, el) {
-            postURL[i] = $(this).attr('href');
-          });
+        // get lifetime data
+        // birth
+        let nodeBorn = findByFilter($, nodeBio, 'Born');
+        if (nodeBorn) {
+          nodeBorn = nodeBorn.children().first().next();
+          let birthDate = nodeBorn.text();
+          bio.birthDate = birthDate;
+          // if birthplace
+          let nodeBirthPlace = nodeBorn.find($('.birthplace'));
+          if (nodeBirthPlace) {
+            let birthPlace = nodeBirthPlace.text();
+            bio.birthPlace = birthPlace;
+          }
+        }
+        // death
+        let nodeDeath = findByFilter($, nodeBio, 'Died');
+        if (nodeDeath) {
+          nodeDeath = nodeDeath.children().first().next();
+          let deathDate = nodeDeath.text();
+          bio.deathDate = deathDate;
+        }
 
-        getPPL = [];
-        $(NavHead).filter(function(i, el) {
-          return $(this).text() === 'Influences';
-        })
-          .siblings()
-          .find('li').each(function(i, el) {
-            getPPL[i] = $(this).text();
-          });
+        json.bio = bio;
 
-        getURL = [];
-        $(NavHead).filter(function(i, el) {
-          return $(this).text() === 'Influences';
-        })
-          .siblings()
-          .find('a').each(function(i, el) {
-            getURL[i] = $(this).attr('href');
-          });
+        // get school
+        let nodeSchool = findByFilterSchool($, nodeBio, 'School');
+        if (nodeSchool) {
+          let schools = getItems($, nodeSchool);
+          json.school = schools;
+        }
 
-        json.postPPL = postPPL;
-        json.postURL = postURL;
-        json.getPPL = getPPL;
-        json.getURL = getURL;
+        // get interestes
+        let nodeInterests = findByFilter($, nodeBio, 'Main Interests');
+        if (nodeInterests) {
+          let interests = getItems($, nodeInterests);
+          json.mainInterests = interests;
+        }
 
-        group.push(json);
+        // get notable ideas
+        let notableIdeas = findByFilter($, nodeBio, 'Notable Ideas');
+        if (notableIdeas) {
+          let ideas = getItems($, notableIdeas);
+          json.notableIdeas = ideas;
+        }
 
-        console.log(json);
+        // get notable works
+        let notableWorks = findByFilter($, nodeBio, 'Notable Works');
+        if (notableWorks) {
+          let works = getItems($, notableWorks);
+          json.notableWorks = works;
+        }
+
+        // get influences 
+        let drewFrom = findByFilter($, nodeBio, 'Influences');
+        if (drewFrom) {
+          let influences = getItems($, drewFrom);
+          json.drewFrom = influences;
+        }
+
+        // get influenced
+        let influenced = findByFilter($, nodeBio, 'Influenced');
+        if (influenced) {
+          let followers = getItems($, influenced);
+          json.influenced = followers;
+        }
+
+        console.log(JSON.stringify(json, null, 2));
+
       }
     });
   });
 });
 
-
-
 app.listen(3000, () => { console.log('listening on port 3000')});
 
 module.exports = { app }
 
+const findByFilter = ($, node, criterion) => {
+  let returnNode = 
+    node
+      .children()
+      .filter(function(i, el) {
+        return $(this).children().first().text() === criterion;
+      });
+  return returnNode;
+}
 
-        // fs.writeFile(`phil_${letter}.json`, JSON.stringify(philosophers, null, 4), (err) => {
-        //  if (err) console.log(err);
-        //  else console.log('File successfully written!');
-        // });
+const findByFilterSchool = ($, node, criterion) => {
+  let returnNode = 
+    node
+      .children()
+      .filter(function(i, el) {
+        return $(this).children().first().children().first().text() === criterion;
+      });
+  return returnNode;
+}
+
+const getItems = ($, node) => {
+  let ul = node.find('ul');
+  if (!ul) return node.text();
+  else {
+    let returnData = []
+    ul
+      .find('li')
+      .each(function(i, el) {
+        returnData.push($(this).text());
+      });
+    return returnData;
+  }
+}
+
+        /**
+            GET BIO
+        */
+
+
+
+        // let nameNode = $('.fn');
+        // let name = nameNode.text();
+
+        // let birtNode = 
+
+
+
+        // let postPPL = [];
+        // $(NavHead).filter(function(i, el) {
+        //   return $(this).text() === 'Influenced';
+        // })
+        //   .siblings()
+        //   .find('li').each(function(i, el) {
+        //     postPPL[i] = $(this).text();
+        //   });
+
+        // let postURL = [];
+        // $(NavHead).filter(function(i, el) {
+        //   return $(this).text() === 'Influenced';
+        // })
+        //   .siblings()
+        //   .find('a').each(function(i, el) {
+        //     postURL[i] = $(this).attr('href');
+        //   });
+
+        // let getPPL = [];
+        // $(NavHead).filter(function(i, el) {
+        //   return $(this).text() === 'Influences';
+        // })
+        //   .siblings()
+        //   .find('li').each(function(i, el) {
+        //     getPPL[i] = $(this).text();
+        //   });
+
+        // let getURL = [];
+        // $(NavHead).filter(function(i, el) {
+        //   return $(this).text() === 'Influences';
+        // })
+        //   .siblings()
+        //   .find('a').each(function(i, el) {
+        //     getURL[i] = $(this).attr('href');
+        //   });
+
+        // json.postPPL = postPPL;
+        // json.postURL = postURL;
+        // json.getPPL = getPPL;
+        // json.getURL = getURL;
+
+        // group.push(json);
+
+        // console.log(json);
+

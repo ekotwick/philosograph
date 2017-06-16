@@ -10,7 +10,8 @@ app.get('/', (req, res, next) => {
   const urls = [
   'https://en.wikipedia.org/wiki/Aristotle',
   'https://en.wikipedia.org/wiki/Ludwig_Wittgenstein',
-  'https://en.wikipedia.org/wiki/Parmenides'
+  'https://en.wikipedia.org/wiki/Parmenides',
+  'https://en.wikipedia.org/wiki/Nancy_Cartwright_(philosopher)'
   ];
 
   urls.forEach(url => {
@@ -28,11 +29,12 @@ app.get('/', (req, res, next) => {
             .find($('.fn'));
         let name = nodeName.text();
         bio.name = name;
-
+        console.log('\n\n', url)
         // get lifetime data
         // birth
         let nodeBorn = findByFilter($, nodeBio, 'Born');
         if (nodeBorn) {
+          // console.log('\n BORN \n')
           nodeBorn = nodeBorn.children().first().next();
           let birthDate = nodeBorn.text();
           bio.birthDate = birthDate;
@@ -46,6 +48,7 @@ app.get('/', (req, res, next) => {
         // death
         let nodeDeath = findByFilter($, nodeBio, 'Died');
         if (nodeDeath) {
+          // console.log('\n DIED \n')
           nodeDeath = nodeDeath.children().first().next();
           let deathDate = nodeDeath.text();
           bio.deathDate = deathDate;
@@ -56,13 +59,41 @@ app.get('/', (req, res, next) => {
         // get school
         let nodeSchool = findByFilterSchool($, nodeBio, 'School');
         if (nodeSchool) {
-          let schools = getItems($, nodeSchool);
-          json.school = schools;
+          let schools = [];
+          let children = nodeSchool.find('td').children();
+          if (children.children().first().is('ul')) {
+            children
+              .find('li')
+              .children()
+              .each(function(i, el){
+                let school = { name: '', href: '' };
+                school.name = $(this).text();
+                school.href = $(this).attr('href');
+                schools.push(school);
+              });
+          } else {
+            children
+              .each(function(i, el){
+                if (!$(this).is('br')) {
+                  let school = { name: '', href: '' };
+                  school.name = $(this).text();
+                  school.href = $(this).attr('href');
+                  schools.push(school);
+                }
+              });
+          }
+          json.schools = schools;
         }
+        // if (nodeSchool) {
+        //   // console.log('\n SCHOOL \n')
+        //   let schools = getItems($, nodeSchool);
+        //   json.school = schools;
+        // }
 
         // get interestes
         let nodeInterests = findByFilter($, nodeBio, 'Main Interests');
         if (nodeInterests) {
+          // console.log('\n INTERESTS \n')
           let interests = getItems($, nodeInterests);
           json.mainInterests = interests;
         }
@@ -70,6 +101,7 @@ app.get('/', (req, res, next) => {
         // get notable ideas
         let notableIdeas = findByFilter($, nodeBio, 'Notable Ideas');
         if (notableIdeas) {
+          // console.log('\n IDEAS \n')
           let ideas = getItems($, notableIdeas);
           json.notableIdeas = ideas;
         }
@@ -77,6 +109,7 @@ app.get('/', (req, res, next) => {
         // get notable works
         let notableWorks = findByFilter($, nodeBio, 'Notable Works');
         if (notableWorks) {
+          // console.log('\n WORKS \n')
           let works = getItems($, notableWorks);
           json.notableWorks = works;
         }
@@ -84,6 +117,7 @@ app.get('/', (req, res, next) => {
         // get influences 
         let drewFrom = findByFilter($, nodeBio, 'Influences');
         if (drewFrom) {
+          // console.log('\n INFLUENCES \n')
           let influences = getItems($, drewFrom);
           json.drewFrom = influences;
         }
@@ -91,6 +125,7 @@ app.get('/', (req, res, next) => {
         // get influenced
         let influenced = findByFilter($, nodeBio, 'Influenced');
         if (influenced) {
+          // console.log('\n INFLUENCED \n')
           let followers = getItems($, influenced);
           json.influenced = followers;
         }

@@ -31,9 +31,9 @@ router.get('/:span', (req, res, next) => {
       else {
 
         let $ = cheerio.load(html);
-        let loc = 'h2';
+        let node = 'h2';
 
-        $(loc)
+        $(node)
           .filter(function(i, el) {
             return $(this).children().first().text() === letter;
           })

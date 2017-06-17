@@ -10,8 +10,9 @@ app.get('/', (req, res, next) => {
   const urls = [
   'https://en.wikipedia.org/wiki/Aristotle',
   'https://en.wikipedia.org/wiki/Ludwig_Wittgenstein',
-  'https://en.wikipedia.org/wiki/Parmenides',
-  'https://en.wikipedia.org/wiki/Nancy_Cartwright_(philosopher)'
+  // 'https://en.wikipedia.org/wiki/Parmenides',
+  'https://en.wikipedia.org/wiki/Nancy_Cartwright_(philosopher)',
+  'https://en.wikipedia.org/wiki/Thomas_Aquinas'
   ];
 
   urls.forEach(url => {
@@ -22,7 +23,7 @@ app.get('/', (req, res, next) => {
         let json = {}
 
         let bio = {};
-        let nodeBio = $('.vcard').children().first();
+        let nodeBio = $('.biography').children().first();
         // get name
         let nodeName = 
           nodeBio
@@ -190,8 +191,19 @@ app.get('/', (req, res, next) => {
                 idea.href = $(this).attr('href');
                 ideas.push(idea);
               });
+          } else if (children.first().is('a')) {
+            children
+              .each(function(i, el){
+                if ($(this).is('a')) {
+                  let idea = { name: '', href: '' };
+                  idea.name = $(this).text();
+                  idea.href = $(this).attr('href');
+                  ideas.push(idea);
+                }
+              });
           } else {
             children
+              .find('a')
               .each(function(i, el){
                 if ($(this).is('a')) {
                   let idea = { name: '', href: '' };
@@ -212,10 +224,15 @@ app.get('/', (req, res, next) => {
 
         // get notable works
         let notableWorks = findByFilterSchool($, nodeBio, 'Notable work');
-        if (notableWorks) {
-          // console.log('\n WORKS \n')
-          let works = getItems($, notableWorks);
-          json.notableWorks = works;
+        if (notableWorks.children().length) {
+          let works = [];
+          notableWorks
+            .find('a')
+            .each(function(i, el) {
+              let work = $(this).text();
+              works.push(work);
+            });
+          json.works = works;
         }
 
         // get influences 

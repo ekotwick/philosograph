@@ -124,7 +124,7 @@ app.get('/', (req, res, next) => {
         ////  get notable ideas
         ////
 
-        let notableIdeas = findByFilterSchool($, nodeBio, 'Notable ideas');
+        let notableIdeas = findTwoDeep($, nodeBio, 'Notable ideas');
         if (notableIdeas.children().length) {
           let ideas = [];
           let children = notableIdeas.find('td').children();
@@ -154,8 +154,19 @@ app.get('/', (req, res, next) => {
                 idea.href = $(this).attr('href');
                 ideas.push(idea);
               });
+          } else if (children.first().is('a')) {
+            children
+              .each(function(i, el){
+                if ($(this).is('a')) {
+                  let idea = { name: '', href: '' };
+                  idea.name = $(this).text();
+                  idea.href = $(this).attr('href');
+                  ideas.push(idea);
+                }
+              });
           } else {
             children
+              .find('a')
               .each(function(i, el){
                 if ($(this).is('a')) {
                   let idea = { name: '', href: '' };

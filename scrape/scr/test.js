@@ -235,21 +235,67 @@ app.get('/', (req, res, next) => {
           json.works = works;
         }
 
-        // get influences 
-        let drewFrom = findByFilter($, nodeBio, 'Influences');
-        if (drewFrom) {
-          // console.log('\n INFLUENCES \n')
-          let influences = getItems($, drewFrom);
-          json.drewFrom = influences;
+        const nodeInfluence_S = 
+          $('.NavHead')
+            .filter(function(i, el) {
+              return $(this).text() === 'Influences';
+            });
+
+        const nodeInfluence_D = 
+          $('.NavHead')
+            .filter(function(i, el) {
+              return $(this).text() === 'Influenced';
+            });
+
+        let influences = [];
+        if (nodeInfluence_S.siblings().length) {
+          nodeInfluence_S
+            .siblings()
+            .find('a')
+            .each(function(i, el) {
+              let influence = { name: '', href: '' };
+              influence.name = $(this).text();
+              influence.href = $(this).attr('href');
+              influences.push(influence);
+            });
+
+          json.influences = influences;
         }
 
-        // get influenced
-        let influenced = findByFilter($, nodeBio, 'Influenced');
-        if (influenced) {
-          // console.log('\n INFLUENCED \n')
-          let followers = getItems($, influenced);
-          json.influenced = followers;
+        let influenced = [];
+        if (nodeInfluence_D.siblings().length) {
+          if (nodeInfluence_D.siblings().text().includes('Western')) {
+            influenced.push('****');
+          } else {
+            nodeInfluence_D
+              .siblings()
+              .find('a')
+              .each(function(i, el) {
+                let influence = { name: '', href: '' };
+                influence.name = $(this).text();
+                influence.href = $(this).attr('href');
+                influenced.push(influence);
+              });
+          }
+
+          json.influenced = influenced;
         }
+
+        // // get influences 
+        // let drewFrom = findByFilter($, nodeBio, 'Influences');
+        // if (drewFrom) {
+        //   // console.log('\n INFLUENCES \n')
+        //   let influences = getItems($, drewFrom);
+        //   json.drewFrom = influences;
+        // }
+
+        // // get influenced
+        // let influenced = findByFilter($, nodeBio, 'Influenced');
+        // if (influenced) {
+        //   // console.log('\n INFLUENCED \n')
+        //   let followers = getItems($, influenced);
+        //   json.influenced = followers;
+        // }
 
         console.log(JSON.stringify(json, null, 5));
 

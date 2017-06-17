@@ -134,6 +134,7 @@ app.get('/', (req, res, next) => {
             idea.name = notableIdeas.find('td').text();
             idea.href = notableIdeas.find('td').attr('href');
             ideas.push(idea);
+          }
           if (children.children().first().is('ul')) {
             children
               .find('li')
@@ -179,6 +180,23 @@ app.get('/', (req, res, next) => {
           json.notableIdeas = ideas;
         }
 
+        ////////////////
+        ////
+        ////  get notable works
+        ////
+
+        let notableWorks = findByFilterSchool($, nodeBio, 'Notable work');
+        if (notableWorks.children().length) {
+          let works = [];
+          notableWorks
+            .find('a')
+            .each(function(i, el) {
+              let work = $(this).text();
+              works.push(work);
+            });
+          json.works = works;
+        }
+
       }
     });
   });
@@ -192,4 +210,4 @@ const findTwoDeep = ($, node, criterion) => {
         return $(this).children().first().children().first().text() === criterion;
       });
   return returnNode;
-}
+};

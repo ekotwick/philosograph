@@ -93,6 +93,25 @@ app.get('/', (req, res, next) => {
             }
           }
           bio.birthDate = birthDate;
+          ///
+          /// alternative way to get death date
+          ///
+          let deathData =
+            bottomLinks
+              .find('a')
+              .filter(function(i, el) {
+                return $(this).text().includes('death');
+              })
+              .text()
+              .split(' ');
+          let deathDate;
+          for (let i = 0; i < deathData.length; i++) {
+            if(d.test(deathData[i])) {
+              deathDate = deathData[i];
+              break;
+            }
+          }
+          bio.deathDate = deathDate;
         }
 
         ////////////////

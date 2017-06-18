@@ -3,6 +3,8 @@ const fs = require('fs');
 const request = require('request');
 const cheerio = require('cheerio');
 const _flow = require('lodash').flow;
+const nationalities = require('./dataLists').nationalities;
+const regions = require('./dataLists').regions;
 
 const app = express();
 
@@ -72,10 +74,35 @@ app.get('/', (req, res, next) => {
           }
         } else {
           bioNodes.hasBornNode = false;
-          ///
-          /// alternative way to get birth date
-          ///
-          let bottomLinks = $('#catlinks').children().first();
+        }
+
+        ////////////////
+        ////
+        ////  get death
+        ////
+
+        let nodeDeath = findOneDeep($, nodeBio, 'Died');
+        let hasDeathNode;
+        if (nodeDeath.children().length) {
+          bioNodes.hasDeathNode = true;
+          let deathData = nodeDeath.children().first().next().text().split('\n');
+          let deathDate;
+          const d = /\d/;
+          for (let i = 0; i < deathData.length; i++) {
+            if (d.test(deathData[i])) {
+              deathDate = deathData[i];
+              break;
+            }
+          }
+          bio.deathDate = getYear(deathDate);
+        } else {
+          bioNodes.hasDeathNode = false;
+        }
+        
+        // the following three if cases: if there is a .vcard, but not the needed biographical data, search the bottom links for alteratives;
+        let bottomLinks = $('#catlinks').children().first();
+        const d = /\d/;
+        if (!bio.birthDate) {
           let birthData =
             bottomLinks
               .find('a')
@@ -84,7 +111,6 @@ app.get('/', (req, res, next) => {
               })
               .text()
               .split(' ');
-          const d = /\d/;
           let birthDate;
           for (let i = 0; i < birthData.length; i++) {
             if(d.test(birthData[i])) {
@@ -93,28 +119,9 @@ app.get('/', (req, res, next) => {
             }
           }
           bio.birthDate = birthDate;
-          ///
-          /// alternative way to get death date
-          ///
-          let deathData =
-            bottomLinks
-              .find('a')
-              .filter(function(i, el) {
-                return $(this).text().includes('death');
-              })
-              .text()
-              .split(' ');
-          let deathDate;
-          for (let i = 0; i < deathData.length; i++) {
-            if(d.test(deathData[i])) {
-              deathDate = deathData[i];
-              break;
-            }
-          }
-          bio.deathDate = deathDate;
-          ///
-          /// alternative way to get place of birth
-          ///
+        }
+
+        if (!bio.birthPlace) {
           let possibleCountries = [];
           let notFound = true;
           let nationality;
@@ -145,28 +152,24 @@ app.get('/', (req, res, next) => {
           }
           bio.birthPlace = nationality;
         }
-
-        ////////////////
-        ////
-        ////  get death
-        ////
-
-        let nodeDeath = findOneDeep($, nodeBio, 'Died');
-        let hasDeathNode;
-        if (nodeDeath.children().length) {
-          bioNodes.hasDeathNode = true;
-          let deathData = nodeDeath.children().first().next().text().split('\n');
+        
+        if (!bio.deathDate) {
+          let deathData =
+            bottomLinks
+              .find('a')
+              .filter(function(i, el) {
+                return $(this).text().includes('death');
+              })
+              .text()
+              .split(' ');
           let deathDate;
-          const d = /\d/;
           for (let i = 0; i < deathData.length; i++) {
-            if (d.test(deathData[i])) {
+            if(d.test(deathData[i])) {
               deathDate = deathData[i];
               break;
             }
           }
-          bio.deathDate = getYear(deathDate);
-        } else {
-          bioNodes.hasDeathNode = false;
+          bio.deathDate = deathDate;
         }
 
         json.bioNodes = bioNodes;

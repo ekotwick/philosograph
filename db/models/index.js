@@ -2,6 +2,7 @@
 
 const metaModels = {
       Urls: require('./Urls'),
+      AllData: require('./AllData');
     }
     , {mapValues} = require('lodash');
 

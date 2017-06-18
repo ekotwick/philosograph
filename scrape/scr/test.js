@@ -42,8 +42,8 @@ app.get('/', (req, res, next) => {
 
   const urls = [
   // 'https://en.wikipedia.org/wiki/Ludwig_Wittgenstein',
-  'https://en.wikipedia.org/wiki/Parmenides',
-  'https://en.wikipedia.org/wiki/Nancy_Cartwright_(philosopher)',
+  // 'https://en.wikipedia.org/wiki/Parmenides',
+  // 'https://en.wikipedia.org/wiki/Nancy_Cartwright_(philosopher)',
   // 'https://en.wikipedia.org/wiki/Thomas_Aquinas',
   // 'https://en.wikipedia.org/wiki/Aristotle',
   // 'https://en.wikipedia.org/wiki/Immanuel_Kant',
@@ -59,17 +59,17 @@ app.get('/', (req, res, next) => {
   // 'https://en.wikipedia.org/wiki/Calcidius',
   // 'https://en.wikipedia.org/wiki/John_Calvin',
   // 'https://en.wikipedia.org/wiki/Callicles',
-  'https://en.wikipedia.org/wiki/Johannes_Clauberg',
+  // 'https://en.wikipedia.org/wiki/Johannes_Clauberg',
   // 'https://en.wikipedia.org/wiki/Cleanthes',
   // 'https://en.wikipedia.org/wiki/Clement_of_Alexandria',
-  'https://en.wikipedia.org/wiki/Catherine_Cl%C3%A9ment',
+  // 'https://en.wikipedia.org/wiki/Catherine_Cl%C3%A9ment',
   // 'https://en.wikipedia.org/wiki/Cleomedes',
   // 'https://en.wikipedia.org/wiki/William_Kingdon_Clifford',
   // 'https://en.wikipedia.org/wiki/Catherine_Trotter_Cockburn',
   // 'https://en.wikipedia.org/wiki/Lorraine_Code',
   // 'https://en.wikipedia.org/wiki/Gerald_Cohen',
   // 'https://en.wikipedia.org/wiki/Hermann_Cohen',
-  // 'https://en.wikipedia.org/wiki/L._Jonathan_Cohen',
+  'https://en.wikipedia.org/wiki/L._Jonathan_Cohen',
   // 'https://en.wikipedia.org/wiki/Morris_Raphael_Cohen',
   // 'https://en.wikipedia.org/wiki/Samuel_Taylor_Coleridge',
   // 'https://en.wikipedia.org/wiki/John_Colet',
@@ -164,7 +164,7 @@ app.get('/', (req, res, next) => {
         } else {
           bioNodes.hasDeathNode = false;
         }
-        
+
         // the following three if cases: if there is a .vcard, but not the needed biographical data, search the bottom links for alteratives;
         let bottomLinks = $('#catlinks').children().first();
         const d = /\d/;
@@ -211,6 +211,23 @@ app.get('/', (req, res, next) => {
             for (let i = 0; i < possibleCountries.length; i++) {
               if (regions[possibleCountries[i]]) {
                 nationality = regions[possibleCountries[i]];
+                notFound = false;
+                break;
+              }
+            }
+          }
+          if (notFound) {
+            let allText = [];
+            bottomLinks
+              .find('a')
+              .each(function(i, el) {
+                let currText = $(this).text().toLowerCase().split(' ');
+                allText += currText + ',';
+              })
+            possibleCountries = allText.split(',');
+            for (let i = 0; i < possibleCountries.length; i++) {
+              if (nationalities[possibleCountries[i]]) {
+                nationality = nationalities[possibleCountries[i]];
                 notFound = false;
                 break;
               }

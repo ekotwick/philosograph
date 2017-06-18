@@ -134,6 +134,7 @@ const trimParens = (str) => {
 
 const getYearOnly = (str) => {
   let split = str.trim().split(' ');
+  if (str.includes('or')) return str.split(' or ').slice(-1) // imprecise date, e.g., '455 or 451'
   if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
   if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
   return str;

@@ -150,6 +150,23 @@ app.get('/', (req, res, next) => {
               }
             }
           }
+          if (notFound) {
+            let allText = [];
+            bottomLinks
+              .find('a')
+              .each(function(i, el) {
+                let currText = $(this).text().toLowerCase().split(' ');
+                allText += currText + ',';
+              })
+            possibleCountries = allText.split(',');
+            for (let i = 0; i < possibleCountries.length; i++) {
+              if (nationalities[possibleCountries[i]]) {
+                nationality = nationalities[possibleCountries[i]];
+                notFound = false;
+                break;
+              }
+            }
+          }
           bio.birthPlace = nationality;
         }
         

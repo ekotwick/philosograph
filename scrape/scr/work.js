@@ -66,7 +66,7 @@ app.get('/', (req, res, next) => {
           }
           json.schools = schools;
         } else {
-          jsdon.hasSchoolNode = false;
+          json.hasSchoolNode = false;
         }
 
         ////////////////

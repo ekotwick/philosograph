@@ -68,9 +68,11 @@ app.get('/', (req, res, next) => {
           if (locations.length > 1) {
             locSpecific = locations[0];
             locGeneral = locations.slice(-1);
-            bio.birthPlace = `${locSpecific} ${locGeneral}`;
+            let birthPlace = `${locSpecific} ${locGeneral}`;
+            bio.birthPlace = trimParens(birthPlace);
           } else {
-            bio.birthPlace = locations[0];
+            let birthPlace = locations[0];
+            bio.birthPlace = trimParens(birthPlace);
           }
         } else {
           bioNodes.hasBornNode = false;
@@ -226,7 +228,7 @@ const trimParens = (str) => {
 
 const getYearOnly = (str) => {
   let split = str.trim().split(' ');
-  if (str.includes('or')) return str.split(' or ').slice(-1) // imprecise date, e.g., '455 or 451'
+  if (str.includes('or')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
   if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
   if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
   return str;

@@ -69,7 +69,7 @@ app.get('/', (req, res, next) => {
   // 'https://en.wikipedia.org/wiki/Lorraine_Code',
   // 'https://en.wikipedia.org/wiki/Gerald_Cohen',
   // 'https://en.wikipedia.org/wiki/Hermann_Cohen',
-  'https://en.wikipedia.org/wiki/L._Jonathan_Cohen',
+  // 'https://en.wikipedia.org/wiki/L._Jonathan_Cohen',
   // 'https://en.wikipedia.org/wiki/Morris_Raphael_Cohen',
   // 'https://en.wikipedia.org/wiki/Samuel_Taylor_Coleridge',
   // 'https://en.wikipedia.org/wiki/John_Colet',
@@ -78,6 +78,33 @@ app.get('/', (req, res, next) => {
   // 'https://en.wikipedia.org/wiki/R._G._Collingwood',
   // 'https://en.wikipedia.org/wiki/Anthony_Collins',
   // 'https://en.wikipedia.org/wiki/Comenius',
+    // 'https://en.wikipedia.org/wiki/Lady_Anne_Finch_Conway',
+    // 'https://en.wikipedia.org/wiki/Nicolaus_Copernicus',
+    // 'https://en.wikipedia.org/wiki/Henry_Corbin',
+    // 'https://en.wikipedia.org/wiki/Victor_Cousin',
+    // 'https://en.wikipedia.org/wiki/Benedetto_Croce',
+    // 'https://en.wikipedia.org/wiki/Cyrano_de_Bergerac_(writer)',
+    // 'https://en.wikipedia.org/wiki/Franz_Xaver_von_Baader',
+    // 'https://en.wikipedia.org/wiki/Francis_Bacon',
+    'https://en.wikipedia.org/wiki/Hibat_Allah_Abu%27l-Barakat_al-Baghdaadi',
+    // 'https://en.wikipedia.org/wiki/Mikhail_Bakunin',
+    // 'https://en.wikipedia.org/wiki/Roland_Barthes',
+    // 'https://en.wikipedia.org/wiki/Georges_Bataille',
+    // 'https://en.wikipedia.org/wiki/Alexander_Gottlieb_Baumgarten',
+    // 'https://en.wikipedia.org/wiki/Nuel_Belnap',
+    // 'https://en.wikipedia.org/wiki/Jonathan_Bennett_(philosopher)',
+    // 'https://en.wikipedia.org/wiki/George_Berkeley',
+    // 'https://en.wikipedia.org/wiki/Bernard_Silvestris',
+    // 'https://en.wikipedia.org/wiki/Ludwig_von_Bertalanffy',
+    // 'https://en.wikipedia.org/wiki/Simon_Blackburn',
+    // 'https://en.wikipedia.org/wiki/Blasius_of_Parma',
+    // 'https://en.wikipedia.org/wiki/Norberto_Bobbio',
+    // 'https://en.wikipedia.org/wiki/Jakob_B%C3%B6hme',
+    // 'https://en.wikipedia.org/wiki/Henry_St_John,_1st_Viscount_Bolingbroke',
+    // 'https://en.wikipedia.org/wiki/Bonaventure',
+    // 'https://en.wikipedia.org/wiki/Rudjer_Boscovich',
+    // 'https://en.wikipedia.org/wiki/Henri_de_Boulainvilliers',
+    // 'https://en.wikipedia.org/wiki/Robert_Boyle',
   ];
 
   urls.forEach(url => {
@@ -134,9 +161,11 @@ app.get('/', (req, res, next) => {
           if (locations.length > 1) {
             locSpecific = locations[0];
             locGeneral = locations.slice(-1);
-            bio.birthPlace = `${locSpecific} ${locGeneral}`;
+            let birthPlace = `${locSpecific} ${locGeneral}`;
+            bio.birthPlace = trimParens(birthPlace);
           } else {
-            bio.birthPlace = locations[0];
+            let birthPlace = locations[0];
+            bio.birthPlace = trimParens(birthPlace);
           }
         } else {
           bioNodes.hasBornNode = false;
@@ -500,7 +529,7 @@ const trimParens = (str) => {
 
 const getYearOnly = (str) => {
   let split = str.trim().split(' ');
-  if (str.includes('or')) return str.split(' or ').slice(-1) // imprecise date, e.g., '455 or 451'
+  if (str.includes('or')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
   if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
   if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
   return str;

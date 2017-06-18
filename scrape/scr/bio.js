@@ -44,7 +44,7 @@ app.get('/', (req, res, next) => {
         ////  get birth details
         ////
 
-        let nodeBorn = findByFilter($, nodeBio, 'Born');
+        let nodeBorn = findOneDeep($, nodeBio, 'Born');
         let hasBornNode;
         if (nodeBorn.children().length) {
           bioNodes.hasBornNode = true;
@@ -78,7 +78,7 @@ app.get('/', (req, res, next) => {
         ////  get death
         ////
 
-        let nodeDeath = findByFilter($, nodeBio, 'Died');
+        let nodeDeath = findOneDeep($, nodeBio, 'Died');
         let hasDeathNode;
         if (nodeDeath.children().length) {
           bioNodes.hasDeathNode = true;
@@ -107,7 +107,6 @@ app.get('/', (req, res, next) => {
 });
 
 const trimParens = (str) => {
-  console.log(str);
   let result = '';
   let inParens = false;
   for (let i = 0; i < str.length; i++) {
@@ -135,4 +134,15 @@ const trimParens = (str) => {
 const getYearOnly = (str) => {
   if (str.trim().split(' ').length > 2) return str.trim().split(' ').slice(-1).join();
   return str;
+};
+
+const findOneDeep = ($, node, criterion) => {
+  let returnNode = 
+    node
+      .children()
+      .filter(function(i, el) {
+        let titleNode = $(this).children().first();
+        return titleNode.text() === criterion;
+      });
+  return returnNode;
 };

@@ -248,10 +248,11 @@ app.get('/', (req, res, next) => {
 });
 
 const isNotANote = (node) => {
-  let href = node.attr('href');
-  if (href.includes('#cite')) return false;
+  let href = node.attr('href') && node.attr('href').includes('#cite');
+  let text = node.text() && node.text().includes('[');
+  if (href || text) return false;
   return true;
-}
+};
 
 const isBigInfluencer = (list) => {
   const regions = ['Western', 'Eastern', 'Indian', 'Chinese', 'Modern', 'Medieval', 'all', 'All'];

@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const request = require('request');
 const cheerio = require('cheerio');
+const _flow = require('lodash').flow;
 
 const app = express();
 
@@ -59,7 +60,7 @@ app.get('/', (req, res, next) => {
               break;
             }
           }
-          bio.birthDate = getYearOnly(trimParens(birthDate));
+          bio.birthDate = getYear(birthDate);
           let locSpecific, locGeneral;
           let locations = birthData.slice(birthDateIndex + 1);
           if (locations.length > 1) {
@@ -91,7 +92,7 @@ app.get('/', (req, res, next) => {
               break;
             }
           }
-          bio.deathDate = getYearOnly(trimParens(deathDate));
+          bio.deathDate = getYear(deathDate);
         } else {
           bioNodes.hasDeathNode = false;
         }
@@ -132,7 +133,9 @@ const trimParens = (str) => {
 };
 
 const getYearOnly = (str) => {
-  if (str.trim().split(' ').length > 2) return str.trim().split(' ').slice(-1).join();
+  let split = str.trim().split(' ');
+  if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
+  if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
   return str;
 };
 
@@ -146,3 +149,5 @@ const findOneDeep = ($, node, criterion) => {
       });
   return returnNode;
 };
+
+const getYear = _flow([trimParens, getYearOnly]);

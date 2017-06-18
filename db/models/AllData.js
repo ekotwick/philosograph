@@ -34,9 +34,9 @@ module.exports = db => db.define('all_data', {
   schools: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('schools').split('|');
-      return { name: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('schools');
+      if (data) return getter(data, 'schools');
+    }
   },
   interest_node: { 
     type: BOOLEAN 
@@ -44,9 +44,9 @@ module.exports = db => db.define('all_data', {
   main_interests: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('main_interests').split('|');
-      return { interest: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('main_interests');
+      if (data) return getter(data, 'main_interests');
+    }
   },
   ideas_node: { 
     type: BOOLEAN 
@@ -54,9 +54,9 @@ module.exports = db => db.define('all_data', {
   notable_ideas: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('notable_ideas').split('|');
-      return { idea: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('notable_ideas');
+      if (data) return getter(data, 'notable_ideas');
+    }
   },
   work_node: { 
     type: BOOLEAN 
@@ -64,9 +64,9 @@ module.exports = db => db.define('all_data', {
   notable_works: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('notable_works').split('|');
-      return { work: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('notable_works');
+      if (data) return getter(data, 'notable_works');
+    }
   },
   influences_node: { 
     type: BOOLEAN 
@@ -74,9 +74,9 @@ module.exports = db => db.define('all_data', {
   influences: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('influences').split('|');
-      return { influences: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('influences');
+      if (data) return getter(data, 'influences');
+    }
   },
   influenced_node: { 
     type: BOOLEAN 
@@ -84,8 +84,20 @@ module.exports = db => db.define('all_data', {
   influenced: { 
     type: ARRAY(STRING),
     get: function() {
-      let toReturn = this.getDataValue('influenced').split('|');
-      return { influenced: toReturn[0], url: toReturn[1] };
-    } 
+      let data = this.getDataValue('influenced');
+      if (data) return getter(data, 'influenced');
+    }
   },
 });
+
+const getter = (data, name) => {
+  let toReturn = [];
+  data.forEach(d => {
+    let dArr = d.split('|');
+    let dObj;
+    let dObj[name] = dArr[0].trim();
+    let dObj.url = dArr[1].trim();
+    toReturn.push(dObj);
+  });
+  return toReturn;
+}

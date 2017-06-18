@@ -72,6 +72,27 @@ app.get('/', (req, res, next) => {
           }
         } else {
           bioNodes.hasBornNode = false;
+          ///
+          /// alternative way to get birth date
+          ///
+          let bottomLinks = $('#catlinks').children().first();
+          let birthData =
+            bottomLinks
+              .find('a')
+              .filter(function(i, el) {
+                return $(this).text().includes('births');
+              })
+              .text()
+              .split(' ');
+          const d = /\d/;
+          let birthDate;
+          for (let i = 0; i < birthData.length; i++) {
+            if(d.test(birthData[i])) {
+              birthDate = birthData[i];
+              break;
+            }
+          }
+          bio.birthDate = birthDate;
         }
 
         ////////////////

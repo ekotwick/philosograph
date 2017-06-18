@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "startscr": "nodemon scrape/index.js",
-    "testscr": "nodemon scrape/scr/test.js"
+    "testscr": "nodemon scrape/scr/test.js",
+    "testnat": "nodemon scrape/scr/nationality.js"
   },
   "author": "",
   "license": "ISC",

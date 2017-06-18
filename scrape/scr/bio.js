@@ -112,6 +112,38 @@ app.get('/', (req, res, next) => {
             }
           }
           bio.deathDate = deathDate;
+          ///
+          /// alternative way to get place of birth
+          ///
+          let possibleCountries = [];
+          let notFound = true;
+          let nationality;
+          bottomLinks 
+            .find('a')
+            .filter(function(i, el) {
+              return $(this).text().toLowerCase().includes('philosophers');
+            })
+            .each(function(i, el) {
+              let kindOfPhilosopher = $(this).text().toLowerCase().split(' ')[0];
+              possibleCountries.push(kindOfPhilosopher);
+            });
+          for (let i = 0; i < possibleCountries.length; i++) {
+            if (nationalities[possibleCountries[i]]) {
+              nationality = nationalities[possibleCountries[i]];
+              notFound = false;
+              break;
+            }
+          }
+          if (notFound) {
+            for (let i = 0; i < possibleCountries.length; i++) {
+              if (regions[possibleCountries[i]]) {
+                nationality = regions[possibleCountries[i]];
+                notFound = false;
+                break;
+              }
+            }
+          }
+          bio.birthPlace = nationality;
         }
 
         ////////////////

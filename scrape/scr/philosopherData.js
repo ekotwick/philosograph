@@ -447,7 +447,7 @@ const trimParens = (str) => {
   if (str) {
     for (let i = 0; i < str.length; i++) {
       let s = str[i];
-      if (inParens) { // if we are not in parentheses
+      if (inParens) { // if we are in parentheses
         if (s === ')' || s === ']') {
           inParens = false;
           continue;
@@ -455,7 +455,7 @@ const trimParens = (str) => {
           continue;
         }
       }
-      else { // if we are in parentheses
+      else { // if we are not in parentheses
         if (s === '(' || s === '[') {
           inParens = true;
           continue;

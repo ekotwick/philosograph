@@ -1,29 +1,36 @@
 'use strict';
 
-const { STRING, ARRAY, BOOLEAN, HSTORE } = require('sequelize');
+const { STRING, ARRAY, BOOLEAN } = require('sequelize');
 
 module.exports = db => db.define('all_data', {
   url: { 
-    type: STRING 
+    type: STRING,
+    unique: true
   },
   name: { 
     type: STRING 
+  },
+  born_node: {
+    type: STRING
   },
   birth_date: { 
     type: STRING 
   },
   residency: { 
     type: STRING,
-    set: function(str) {
-      let trimmed = str.trim();
-      let split = trimmed.split(',');
-      if (split.length > 2) {
-        let toSet = `${split[0]}, ${split.slice(-1)}`;
-        this.setDataValue('residency', toSet);
-      } else {
-        this.setDataValue('residency', str);
-      }
-    } 
+    // set: function(str) {
+    //   let trimmed = str.trim();
+    //   let split = trimmed.split(',');
+    //   if (split.length > 2) {
+    //     let toSet = `${split[0]}, ${split.slice(-1)}`;
+    //     this.setDataValue('residency', toSet);
+    //   } else {
+    //     this.setDataValue('residency', str);
+    //   }
+    // } 
+  },
+  dead_node: {
+    type: STRING
   },
   death_date: { 
     type: STRING 
@@ -95,8 +102,8 @@ const getter = (data, name) => {
   data.forEach(d => {
     let dArr = d.split('|');
     let dObj;
-    let dObj[name] = dArr[0].trim();
-    let dObj.url = dArr[1].trim();
+    dObj[name] = dArr[0].trim();
+    dObj.url = dArr[1].trim();
     toReturn.push(dObj);
   });
   return toReturn;

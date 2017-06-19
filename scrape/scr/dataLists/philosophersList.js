@@ -1590,8 +1590,12 @@ let indices = [];
   }
 })();
 
+let missingIndexArray = [156,158,165,173,177,178,180,522, 526, 530, 531, 532, 535, 537, 538, 539, 540, 544,893,894,895,896,897,898,900,902,905,991,996,997,1000,1011,1012,1276,1280,1281,1284,1288,1289,1291];
+
+let missingPhilosophers = firstArray.filter((el, i) => missingIndexArray.includes(i));
+
 // console.log(indices);
 // console.log(indices.length); //=> 61 (so, 0...60);
 
-module.exports = { firstSet, indices, firstArray };
+module.exports = { firstSet, indices, firstArray, missingPhilosophers };
 

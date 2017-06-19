@@ -1,35 +1,79 @@
-const express = require('express');
+'use strict';
+
+const router = require('express').Router();
+const _flow = require('lodash').flow;
 const request = require('request');
 const cheerio = require('cheerio');
-const _flow = require('lodash').flow;
-const nationalities = require('./dataLists').nationalities;
-const regions = require('./dataLists').regions;
+const chalk = require('chalk');
 
-const app = express();
+const db = require('../../db/index');
+const AllData = db.model('all_data');
+const Url = db.model('url');
 
-app.get('/', (req, res, next) => {
+const natLists = require('./dataLists/nationalitiesList');
+const philLists = require('./dataLists/philosophersList');
+const nationalities = natLists.nationalities;
+const regions = natLists.regions;
+const urlArray = philLists.firstArray;
+const indicesSet = philLists.indices;
+
+const done = chalk.bold.red;
+
+/** problems:
+6: missing: 156,158,165,173,177,178,180
+*/
+
+/** did 
+0000:   0,1,2,3,4,5,6,7,8,9
+0010:   0,1,2,3,4,5,6,7,8,9
+0020:   
+*/
+let indices = indicesSet[20];
+
+router.get('/', (req, res, next) => {
+  for (let i = 0; i < indices.length; i++) {
+    let url = `https://en.wikipedia.org${urlArray[indices[i]]}`;
     request(url, (err, res, html) => {
       if (err) console.log(err);
       else {
-        console.log('\n\n', url);
-
-        let $ = cheerio.load(html);
-        let json = {}
-        let bio = {};
-        let bioNodes = {};
-        let nodeBio = $('.vcard').children().first();
-        let nodeWork = $('.biography').children().first();
+        const $ = cheerio.load(html);
+        const phil = {
+          name: '',
+          url: '',
+          born_node: false,
+          birth_date: '',
+          residency: '',
+          dead_node: false,
+          death_date: '',
+          school_node: false,
+          schools: null,
+          interest_node: false,
+          main_interests: null,
+          ideas_node: false,
+          notable_ideas: null,
+          work_node: false,
+          notable_works: null,
+          influences_node: false,
+          influences: null,
+          influenced_node: false,
+          influenced: null
+        };
+        const nodeBio = $('.vcard').children().first();
+        const nodeWork = $('.biography').children().first();
+        ////////////////
+        ////
+        ////  get url
+        ////
+        phil.url = url;
 
         ////////////////
         ////
         ////  get name
         ////
 
-        let nodeName = 
-          nodeBio
-            .find($('.fn'));
-        let name = nodeName.text();
-        bio.name = name;
+        let nodeName = $('#firstHeading').text();
+        let name = trimParens(nodeName).trim();
+        phil.name = name;
 
         ////////////////
         ////
@@ -37,34 +81,33 @@ app.get('/', (req, res, next) => {
         ////
 
         let nodeBorn = findOneDeep($, nodeBio, 'Born');
-        let hasBornNode;
         if (nodeBorn.children().length) {
-          bioNodes.hasBornNode = true;
-          let birthData = nodeBorn.children().first().next().text().split('\n');
+          phil.born_node = true;
+          let birth_date = nodeBorn.children().first().next().text().split('\n');
           let birthDateIndex; 
           let birthDate;
           const d = /\d/;
-          for (let i = 0; i < birthData.length; i++) {
-            if (d.test(birthData[i])) {
-              birthDate = birthData[i];
+          for (let i = 0; i < birth_date.length; i++) {
+            if (d.test(birth_date[i])) {
+              birthDate = birth_date[i];
               birthDateIndex = i;
               break;
             }
           }
-          bio.birthDate = getYear(birthDate);
+          phil.birth_date = getYear(birthDate);
           let locSpecific, locGeneral;
-          let locations = birthData.slice(birthDateIndex + 1);
+          let locations = birth_date.slice(birthDateIndex + 1);
           if (locations.length > 1) {
             locSpecific = locations[0];
             locGeneral = locations.slice(-1);
-            let birthPlace = `${locSpecific} ${locGeneral}`;
-            bio.birthPlace = trimParens(birthPlace);
+            let residency = `${locSpecific} ${locGeneral}`;
+            phil.residency = trimParens(residency);
           } else {
-            let birthPlace = locations[0];
-            bio.birthPlace = trimParens(birthPlace);
+            let residency = locations[0];
+            phil.residency = trimParens(residency);
           }
         } else {
-          bioNodes.hasBornNode = false;
+          phil.born_node = false;
         }
 
         ////////////////
@@ -73,28 +116,27 @@ app.get('/', (req, res, next) => {
         ////
 
         let nodeDeath = findOneDeep($, nodeBio, 'Died');
-        let hasDeathNode;
         if (nodeDeath.children().length) {
-          bioNodes.hasDeathNode = true;
-          let deathData = nodeDeath.children().first().next().text().split('\n');
+          phil.dead_node = true;
+          let death_date = nodeDeath.children().first().next().text().split('\n');
           let deathDate;
           const d = /\d/;
-          for (let i = 0; i < deathData.length; i++) {
-            if (d.test(deathData[i])) {
-              deathDate = deathData[i];
+          for (let i = 0; i < death_date.length; i++) {
+            if (d.test(death_date[i])) {
+              deathDate = death_date[i];
               break;
             }
           }
-          bio.deathDate = getYear(deathDate);
+          phil.death_date = getYear(deathDate);
         } else {
-          bioNodes.hasDeathNode = false;
+          phil.dead_node = false;
         }
         
         // the following three if cases: if there is a .vcard, but not the needed biographical data, search the bottom links for alteratives;
         let bottomLinks = $('#catlinks').children().first();
         const d = /\d/;
-        if (!bio.birthDate) {
-          let birthData =
+        if (!phil.birth_date) {
+          let birth_date =
             bottomLinks
               .find('a')
               .filter(function(i, el) {
@@ -103,16 +145,16 @@ app.get('/', (req, res, next) => {
               .text()
               .split(' ');
           let birthDate;
-          for (let i = 0; i < birthData.length; i++) {
-            if(d.test(birthData[i])) {
-              birthDate = birthData[i];
+          for (let i = 0; i < birth_date.length; i++) {
+            if(d.test(birth_date[i])) {
+              birthDate = birth_date[i];
               break;
             }
           }
-          bio.birthDate = birthDate;
+          phil.birth_date = birthDate;
         }
 
-        if (!bio.birthPlace) {
+        if (!phil.residency) {
           let possibleCountries = [];
           let notFound = true;
           let nationality;
@@ -142,11 +184,11 @@ app.get('/', (req, res, next) => {
             }
           }
           if (notFound) {
-            let allText = [];
+            let allText = '';
             bottomLinks
               .find('a')
               .each(function(i, el) {
-                let currText = $(this).text().toLowerCase().split(' ');
+                let currText = $(this).text().toLowerCase().split(' ').join(',');
                 allText += currText + ',';
               })
             possibleCountries = allText.split(',');
@@ -158,11 +200,11 @@ app.get('/', (req, res, next) => {
               }
             }
           }
-          bio.birthPlace = nationality;
+          phil.residency = nationality;
         }
         
-        if (!bio.deathDate) {
-          let deathData =
+        if (!phil.death_date) {
+          let death_date =
             bottomLinks
               .find('a')
               .filter(function(i, el) {
@@ -171,21 +213,23 @@ app.get('/', (req, res, next) => {
               .text()
               .split(' ');
           let deathDate;
-          for (let i = 0; i < deathData.length; i++) {
-            if(d.test(deathData[i])) {
-              deathDate = deathData[i];
+          for (let i = 0; i < death_date.length; i++) {
+            if(d.test(death_date[i])) {
+              deathDate = death_date[i];
               break;
             }
           }
-          bio.deathDate = deathDate;
+          phil.death_date = deathDate;
         }
 
-        json.bioNodes = bioNodes;
-        json.bio = bio;
+        ////////////////
+        ////
+        ////  get schools
+        ////
 
         let nodeSchool = findTwoDeep($, nodeWork, 'School');
         if (nodeSchool.children().length) {
-          json.hasSchoolNode = true;
+          phil.school_node = true;
           let schools = [];
           let children = nodeSchool.find('td').children();
           // case one: school infromation is displayed with <a> tags in <l1> tags
@@ -207,9 +251,9 @@ app.get('/', (req, res, next) => {
                 }
               });
           }
-          json.schools = schools;
+          phil.schools = schools;
         } else {
-          json.hasSchoolNode = false;
+          phil.school_node = false;
         }
 
         ////////////////
@@ -219,7 +263,7 @@ app.get('/', (req, res, next) => {
 
         let nodeInterests = findTwoDeep($, nodeWork, 'Main interests');
         if (nodeInterests.children().length) {
-          json.hasInterestNode = true;
+          phil.interest_node = true;
           let interests = [];
           let children = nodeInterests.find('td').children();
           if (!children.length) {
@@ -251,9 +295,9 @@ app.get('/', (req, res, next) => {
                 }
               });
           }
-          json.mainInterests = interests;
+          phil.main_interests = interests;
         } else {
-          json.hasInterestNode = false;
+          phil.interest_node = false;
         }
 
         ////////////////
@@ -263,7 +307,7 @@ app.get('/', (req, res, next) => {
 
         let notableIdeas = findTwoDeep($, nodeWork, 'Notable ideas');
         if (notableIdeas.children().length) {
-          json.hasIdeaNode = true;
+          phil.ideas_node = true;
           let ideas = [];
           let children = notableIdeas.find('td').children();
           if (!children.length) {
@@ -304,9 +348,9 @@ app.get('/', (req, res, next) => {
                 }
               });
           }
-          json.notableIdeas = ideas;
+          phil.notable_ideas = ideas;
         } else {
-          json.hasIdeaNode = false;
+          phil.ideas_node = false;
         }
 
         ////////////////
@@ -316,7 +360,7 @@ app.get('/', (req, res, next) => {
 
         let notableWorks = findTwoDeep($, nodeWork, 'Notable work');
         if (notableWorks.children().length) {
-          json.hasWorkNode = true;
+          phil.work_node = true;
           let works = [];
           notableWorks
             .find('a')
@@ -324,9 +368,9 @@ app.get('/', (req, res, next) => {
               let node = $(this);
               if (isNotANote(node)) works.push(createDataObj(node));
             });
-          json.works = works;
+          phil.notable_works = works;
         } else {
-          json.hasWorkNode = false;
+          phil.work_node = false;
         }
 
         ////////////////
@@ -350,22 +394,25 @@ app.get('/', (req, res, next) => {
 
         let influences = [];
         if (nodeInfluence_S.length) {
-          json.hasInfluence_s_Node = true;
+          phil.influences_node = true;
           nodeInfluence_S
             .find('a')
             .each(function(i, el) {
                 let node = $(this);
-                if (isNotANote(node)) influences.push(createDataObj(node));
+                if (isNotANote(node)) {
+                  checkUrl(node);
+                  influences.push(createDataObj(node));
+                }
             });
 
-          json.influences = influences;
+          phil.influences = influences;
         } else {
-          json.hasInfluence_s_Node = false;
+          phil.influences_node = false;
         }
 
         let influenced = [];
         if (nodeInfluence_D.length) {
-          json.hasInfluence_d_node = true;
+          phil.influenced_node = true;
           let influencedList = nodeInfluence_D.text();
           if (isBigInfluencer(influencedList)) {
             influenced.push('****');
@@ -374,49 +421,58 @@ app.get('/', (req, res, next) => {
               .find('a')
               .each(function(i, el) {
                 let node = $(this);
-                if (isNotANote(node)) influenced.push(createDataObj(node));
+                if (isNotANote(node)) {
+                  checkUrl(node);
+                  influenced.push(createDataObj(node));
+                }
               });
           } 
 
-          json.influenced = influenced;
+          phil.influenced = influenced;
         } else {
-          json.hasInfluence_d_node = false;
+          phil.influenced_node = false;
         }
-
-        console.log(JSON.stringify(json, null, 5));
-
+        AllData.create(phil);
+        console.log(done(indices[i]));
       }
     });
+  }
 });
+
+module.exports = router;
 
 const trimParens = (str) => {
   let result = '';
   let inParens = false;
-  for (let i = 0; i < str.length; i++) {
-    let s = str[i];
-    if (inParens) { // if we are not in parentheses
-      if (s === ')' || s === ']') {
-        inParens = false;
-        continue;
-      } else {
-        continue;
+  if (str) {
+    for (let i = 0; i < str.length; i++) {
+      let s = str[i];
+      if (inParens) { // if we are not in parentheses
+        if (s === ')' || s === ']') {
+          inParens = false;
+          continue;
+        } else {
+          continue;
+        }
+      }
+      else { // if we are in parentheses
+        if (s === '(' || s === '[') {
+          inParens = true;
+          continue;
+        } else {
+          result += s;
+        }
       }
     }
-    else { // if we are in parentheses
-      if (s === '(' || s === '[') {
-        inParens = true;
-        continue;
-      } else {
-        result += s;
-      }
-    }
-  }
   return result;
+  } else {
+    return;
+  }
 };
 
 const getYearOnly = (str) => {
   let split = str.trim().split(' ');
-  if (str.includes('or')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
+  if (str.includes('or ')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
   if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
   if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
   return str;
@@ -443,7 +499,7 @@ const isNotANote = (node) => {
 };
 
 const isBigInfluencer = (list) => {
-  const regions = ['Western', 'Eastern', 'Indian', 'Chinese', 'Modern', 'Medieval', 'all', 'All'];
+  const regions = ['Western', 'Eastern', 'Indian', 'Chinese', 'Modern', 'Medieval', 'all ', 'All '];
   for (let i = 0; i < regions.length; i++) {
     if (list.includes(regions[i])) return true;
   }
@@ -451,10 +507,8 @@ const isBigInfluencer = (list) => {
 };
 
 const createDataObj = (node) => {
-  let obj = { name: '', href: '' };
-  obj.name = node.text();
-  obj.href = node.attr('href');
-  return obj;
+  if (node.attr('href')) return `${node.text()} | ${node.attr('href')}`;
+  return `${node.text()}`;
 };
 
 const findTwoDeep = ($, node, criterion) => {
@@ -466,3 +520,14 @@ const findTwoDeep = ($, node, criterion) => {
       });
   return returnNode;
 };
+
+const checkUrl = (node) => {
+  let name = node.text();
+  let href = node.attr('href');
+  if (href) {
+    let address = `/wiki/${href.split('/').slice(-1)}`;
+    if (!urlArray.includes(address)) {
+      Url.create({name: name, url: address});
+    }
+  }
+}

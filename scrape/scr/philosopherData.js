@@ -16,23 +16,50 @@ const nationalities = natLists.nationalities;
 const regions = natLists.regions;
 const urlArray = philLists.firstArray;
 const indicesSet = philLists.indices;
+const missingIndices = philLists.missingIndices;
+const missingPhilosophers = philLists.missingPhilosophers;
+
 
 const done = chalk.bold.red;
 
+// first round
+
 /** problems:
-6: missing: 156,158,165,173,177,178,180
+// can't read `.trim()` of undefined, involving the `str` value: it's the `trimParens` function
+6:    missing: 156,158,165,173,177,178,180
+20:   missing: 522, 526, 530, 531, 532, 535, 537, 538, 539, 540, 544
+34:   missing: 893,894,895,896,897,898,900,902,905
+38:   missing: 991,996,997,1000,1011,1012
+49:   missing: 1276,1280,1281,1284,1288,1289,1291
 */
 
 /** did 
 0000:   0,1,2,3,4,5,6,7,8,9
 0010:   0,1,2,3,4,5,6,7,8,9
-0020:   
+0020:   0,1,2,3,4,5,6,7,8,9
+0030:   0,1,2,3,4,5,6,7,8,9
+0040:   0,1,2,3,4,5,6,7,8,9
+0050:   0,1,2,3,4,5,6,7,8,9
+0060:   0
 */
-let indices = indicesSet[20];
+
+// second round
+/**problems: index number provided
+1 (whole index set)
+3: #18, #22
+5 (whole index set)
+6: except 35, 39
+*/
+
+/** did
+000:  0,1,2,3,4,5,6 // done
+*/
+let num = 0;
+let indices = missingIndices[num];
 
 router.get('/', (req, res, next) => {
   for (let i = 0; i < indices.length; i++) {
-    let url = `https://en.wikipedia.org${urlArray[indices[i]]}`;
+    let url = `https://en.wikipedia.org${missingPhilosophers[indices[i]]}`;
     request(url, (err, res, html) => {
       if (err) console.log(err);
       else {

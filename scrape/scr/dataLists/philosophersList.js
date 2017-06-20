@@ -1590,12 +1590,39 @@ let indices = [];
   }
 })();
 
-let missingIndexArray = [156,158,165,173,177,178,180,522, 526, 530, 531, 532, 535, 537, 538, 539, 540, 544,893,894,895,896,897,898,900,902,905,991,996,997,1000,1011,1012,1276,1280,1281,1284,1288,1289,1291];
+let missingIndices = [];
+let missingIndexArray = [
+  156,158,165,173,177,178,
+  180,522,526,530,531,532,
+  535,537,538,539,540,544,
+  893,894,895,896,897,898,
+  900,902,905,991,996,997,
+  1000,1011,1012,1276,1280,1281,
+  1284,1288,1289,1291];
+
+(function() {
+  let count = 1;
+  let currSet = [];
+  for (let i = 0; i < missingIndexArray.length; i++) {
+    currSet.push(i);
+    count++;
+    if (count > 5) { // reset to 25
+      missingIndices.push(currSet);
+      currSet = [];
+      count = 0;
+    }
+    if (i === missingIndexArray.length - 1) {
+      missingIndices.push(currSet);
+    }
+  }
+})();
+
+// console.log()
 
 let missingPhilosophers = firstArray.filter((el, i) => missingIndexArray.includes(i));
 
 // console.log(indices);
 // console.log(indices.length); //=> 61 (so, 0...60);
 
-module.exports = { firstSet, indices, firstArray, missingPhilosophers };
+module.exports = { firstSet, indices, firstArray, missingPhilosophers, missingIndices };
 

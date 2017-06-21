@@ -2,9 +2,8 @@
 
 const router = require('express').Router();
 
-router.use('/phil', require('./philosophers'));
 router.use('/firstUrl', require('./sortPhilosophers'));
-router.use('/philData', require('./philosopherData'));
+router.use('/philData', require('./philosophersFirstRound'));
 
 router.get('/', (req, res, next) => {
   res.sendStatus(200);

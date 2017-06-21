@@ -54,7 +54,7 @@ const done = chalk.bold.red;
 /** did
 000:  0,1,2,3,4,5,6 // done
 */
-let num = 0;
+let num = 6;
 let indices = missingIndices[num];
 
 router.get('/', (req, res, next) => {
@@ -498,10 +498,12 @@ const trimParens = (str) => {
 };
 
 const getYearOnly = (str) => {
-  let split = str.trim().split(' ');
-  if (str.includes('or ')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
-  if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
-  if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
+  if (str) {
+    let split = str.trim().split(' ');
+    if (str.includes('or ')) return str.split(' or ').slice(-1).join().trim(); // imprecise date, e.g., '455 or 451'
+    if (split[0].includes('c')) return split.slice(1).join(' '); // imprecise date, e.g., 'c. 420 BC'
+    if (split.length > 2) return split.slice(-1).join(); // overly precise date, e.g., '12 April 1845'
+  }
   return str;
 };
 

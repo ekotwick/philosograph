@@ -1624,5 +1624,5 @@ let missingPhilosophers = firstArray.filter((el, i) => missingIndexArray.include
 // console.log(indices);
 // console.log(indices.length); //=> 61 (so, 0...60);
 
-module.exports = { firstSet, indices, firstArray, missingPhilosophers, missingIndices };
+module.exports = { firstSet, indices, firstArray, missingPhilosophers, missingIndices, missingIndexArray };
 

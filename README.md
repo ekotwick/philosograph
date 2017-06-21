@@ -1,1 +1,5 @@
-http://leiterreports.typepad.com/blog/2009/05/the-20-most-important-philosophers-of-all-time.html
+Aim: map out the connections among philosophers/scientists throughout history according to data available on wikipedia. Map should show relations of influence across time and geographic region.
+
+Done so far: built a few scrapers that collect biographical data for philosophers/scientists (so far 1,500 listed items)
+
+To do: data analysis and D3

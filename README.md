@@ -2,4 +2,4 @@ Aim: map out the connections among philosophers/scientists throughout history ac
 
 Done so far: built a few scrapers that collect biographical data for philosophers/scientists (so far 1,500 listed items)
 
-To do: data analysis and D3
+To do: data analysis and D3, tests, and documentation

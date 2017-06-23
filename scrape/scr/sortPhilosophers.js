@@ -5,44 +5,49 @@ const router = require('express').Router();
 const db = require('../../db/index');
 const Url = db.model('url');
 const UrlTrie = require('./sortingTrie').UrlTrie;
+const AllData = db.model('all_data');
 
 
-router.get('/:type', (req, res, next) => {
-  let type = req.params.type;
-  Url.findAll()
-    .then(philsAndUrls => makeDataSet(type, philsAndUrls))
-    .then(data => stringify(type, data));
+router.get('/:model/:dataStructure/:dataItem', (req, res, next) => {
+  let ds = req.params.dataStructure;
+  let item = req.params.dataItem;
+  let model = req.params.model;
+  let table = model === 'url' ? Url : AllData;
+  table.findAll()
+    .then(data => makeDataSet(ds, data, item))
+    .then(data => stringify(ds, data));
 });
 
 
 module.exports = router;
 
-const makeDataSet = (type, data) => {
-  if (type === 'trie') return trieInsertion(data);
-  else if (type === 'set') return setInsertion(data);
+const makeDataSet = (ds, data, item) => {
+  console.log(data.length, ds, item);
+  if (ds === 'trie') return trieInsertion(data, item);
+  else if (ds === 'set') return setInsertion(data, item);
 };
 
-const trieInsertion = (data) => {
+const trieInsertion = (data, item) => {
   let trie = new UrlTrie();
   data.forEach(datum => {
-    let url = datum.url;
-    trie.insert(url);
+    let val = datum[item];
+    trie.insert(val);
   });
   return trie;
 };
 
-const setInsertion = (data) => {
+const setInsertion = (data, item) => {
   let set = new Set();
   data.forEach(datum => {
-    let url = datum.url;
-    set.add(url);
+    let val = datum[item];
+    set.add(val);
   });
   return set;
 };
 
-const stringify = (type, dataSet) => {
-  if (type === 'trie') return trieStringify(dataSet);
-  else if (type === 'set') return setStringify(dataSet);
+const stringify = (ds, dataSet) => {
+  if (ds === 'trie') return trieStringify(dataSet);
+  else if (ds === 'set') return setStringify(dataSet);
 }
 
 const trieStringify = (trie, cb) => {
@@ -53,7 +58,7 @@ const trieStringify = (trie, cb) => {
 };
 
 const setStringify = (set, cb) => {
-  fs.writeFile(`first_round_set.json`, JSON.stringify([...set], null, 2), (err) => {
+  fs.writeFile(`eight_round_urls.json`, JSON.stringify([...set], null, 2), (err) => {
     if (err) console.log('\n\n',err,'\n\n');
     else console.log('\n\nSet successfully written to file!\n\n');
   });

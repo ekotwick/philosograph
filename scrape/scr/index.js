@@ -3,7 +3,8 @@
 const router = require('express').Router();
 
 router.use('/firstUrl', require('./sortPhilosophers'));
-router.use('/philData', require('./philosophersFirstRound'));
+router.use('/philData', require('./getPhilosopherData'));
+router.use('/missing', require('./fetchWhereMissing'));
 
 router.get('/', (req, res, next) => {
   res.sendStatus(200);

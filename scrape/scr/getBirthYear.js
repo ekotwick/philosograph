@@ -1,14 +1,12 @@
 'use strict';
 
 const router = require('express').Router();
-const _flow = require('lodash').flow;
 const request = require('request');
 const cheerio = require('cheerio');
 const chalk = require('chalk');
 
 const db = require('../../db/index');
 const AllData = db.model('all_data');
-const Url = db.model('url');
 
 const philLists = require('./dataLists/missingBirths');
 const births = philLists.missingBirths;

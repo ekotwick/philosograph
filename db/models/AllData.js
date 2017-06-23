@@ -40,71 +40,71 @@ module.exports = db => db.define('all_data', {
   },
   schools: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('schools');
-      if (data) return getter(data, 'schools');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('schools');
+    //   if (data) return getter(data, 'schools');
+    // }
   },
   interest_node: { 
     type: BOOLEAN 
   },
   main_interests: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('main_interests');
-      if (data) return getter(data, 'main_interests');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('main_interests');
+    //   if (data) return getter(data, 'main_interests');
+    // }
   },
   ideas_node: { 
     type: BOOLEAN 
   },
   notable_ideas: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('notable_ideas');
-      if (data) return getter(data, 'notable_ideas');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('notable_ideas');
+    //   if (data) return getter(data, 'notable_ideas');
+    // }
   },
   work_node: { 
     type: BOOLEAN 
   },
   notable_works: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('notable_works');
-      if (data) return getter(data, 'notable_works');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('notable_works');
+    //   if (data) return getter(data, 'notable_works');
+    // }
   },
   influences_node: { 
     type: BOOLEAN 
   },
   influences: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('influences');
-      if (data) return getter(data, 'influences');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('influences');
+    //   if (data) return getter(data, 'influences');
+    // }
   },
   influenced_node: { 
     type: BOOLEAN 
   },
   influenced: { 
     type: ARRAY(STRING),
-    get: function() {
-      let data = this.getDataValue('influenced');
-      if (data) return getter(data, 'influenced');
-    }
+    // get: function() {
+    //   let data = this.getDataValue('influenced');
+    //   if (data) return getter(data, 'influenced');
+    // }
   },
 });
 
-const getter = (data, name) => {
-  let toReturn = [];
-  data.forEach(d => {
-    let dArr = d.split('|');
-    let dObj;
-    dObj[name] = dArr[0].trim();
-    dObj.url = dArr[1].trim();
-    toReturn.push(dObj);
-  });
-  return toReturn;
-}
+// const getter = (data, name) => {
+//   let toReturn = [];
+//   data.forEach(d => {
+//     let dArr = d.split('|');
+//     let dObj;
+//     dObj[name] = dArr[0].trim();
+//     dObj.url = dArr[1].trim();
+//     toReturn.push(dObj);
+//   });
+//   return toReturn;
+// }
